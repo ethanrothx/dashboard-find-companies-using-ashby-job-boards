@@ -116,6 +116,51 @@ python -m ashby_discovery \
   --search-queries-file search_queries.txt
 ```
 
+## 📈 Job Scraper (`ashby_discovery.jobs`)
+
+After discovery, scrape each verified company's open roles and rank them by
+hiring activity. This ingests the discovery output, queries Ashby's public
+job-board API per company, and emits sortable data plus an interactive HTML
+dashboard.
+
+Run it:
+
+```bash
+python -m ashby_discovery.jobs \
+  --input output/verified_ashby_slugs.json \
+  --output-dir output
+```
+
+Smoke test on the first few companies:
+
+```bash
+python -m ashby_discovery.jobs --limit 5
+```
+
+What you get per company (sortable/filterable):
+
+- `job_count`, `remote_job_count`
+- `location_count`, `top_location`
+- `department_count`, `top_department`
+- `employment_types` breakdown (e.g. `FullTime:13, Contract:12`)
+- full `locations` / `departments` lists
+- `fetch_status` (`OK` / `EMPTY` / `ERROR`)
+
+Outputs inside `--output-dir`:
+
+- `ashby_companies.csv` / `.json` — one row per company (sort in any tool)
+- `ashby_companies_jobs.csv` — one row per open role
+- `ashby_companies_dashboard.html` — self-contained dashboard: click any
+  column header to sort, search by company/location/department, filter by
+  status / min job count / remote-friendly, and click a row to expand its roles
+
+Notes:
+
+- Ashby org names are case-sensitive, so the scraper retries a capitalized slug
+  variant when the discovered slug returns nothing.
+- Tunables: `--concurrency`, `--request-delay`, `--timeout`, `--retries`,
+  `--limit`, `--no-html`, `--quiet`.
+
 ## 📝 Inputs
 
 - `search_queries.txt`: default query list (`#` comments supported)
